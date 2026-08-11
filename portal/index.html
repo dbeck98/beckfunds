@@ -127,6 +127,15 @@
     margin-top: 18px;
     font-size: 12.5px; color: var(--muted); letter-spacing: 0.04em;
   }
+  .login-error {
+    margin-top: 16px;
+    padding: 10px 14px;
+    border: 1px solid rgba(90,31,36,0.4);
+    background: rgba(90,31,36,0.06);
+    color: var(--oxblood);
+    font-size: 13px;
+    text-align: left;
+  }
   .login-foot {
     margin-top: 28px; padding-top: 20px;
     border-top: 1px solid var(--hairline);
@@ -524,7 +533,9 @@
       <button class="btn-brand" type="submit">Sign In</button>
     </form>
 
-    <div class="login-demo">Design preview — any credentials open the demo account.</div>
+    <div class="login-error" id="login-error" role="alert" hidden>That email and password didn't match. Check them and try again.</div>
+
+    <div class="login-demo">Design preview — access limited to authorized users.</div>
 
     <div class="login-foot">
       BIG Growth Fund I, LP &nbsp;·&nbsp; Texas Hill Country<br>
@@ -559,7 +570,7 @@
     <div class="view active" id="view-capital">
 
       <div class="eyebrow">BIG Growth Fund I, LP</div>
-      <h1 class="page-title">Welcome back, Jordan</h1>
+      <h1 class="page-title">Welcome back, <span id="greet-name">Jordan</span></h1>
       <p class="page-sub">Investor since February 2026 &nbsp;·&nbsp; Class A Limited Partner &nbsp;·&nbsp; Statement as of August 11, 2026</p>
 
       <div class="hero-card">
@@ -1182,19 +1193,64 @@
   });
   box.appendChild(svg);
 
-  /* ---------- auth + nav ---------- */
-  document.getElementById('login-form').addEventListener('submit', function (e) {
-    e.preventDefault();
+  /* ---------- auth + nav ----------
+     NOTE: this is a preview gate, not security. The check runs in the
+     browser of a public static page — real authentication needs a backend. */
+  var USERS = [
+    { email: 'dillon@beckfunds.com', name: 'Dillon',
+      hash: '5994471abb01112afcc18159f6cc74b4f511b99806da59b3caf5a9c173cacfc5' }
+  ];
+
+  function sha256Hex(text) {
+    return crypto.subtle.digest('SHA-256', new TextEncoder().encode(text)).then(function (buf) {
+      return Array.prototype.map.call(new Uint8Array(buf), function (b) {
+        return b.toString(16).padStart(2, '0');
+      }).join('');
+    });
+  }
+
+  var loginError = document.getElementById('login-error');
+  var greetName = document.getElementById('greet-name');
+
+  function enter(name) {
+    if (name) greetName.textContent = name;
     document.body.classList.add('authed');
     window.scrollTo(0, 0);
-    try { sessionStorage.setItem('big-demo-authed', '1'); } catch (err) {}
+    try {
+      sessionStorage.setItem('big-demo-authed', '1');
+      sessionStorage.setItem('big-demo-name', name || '');
+    } catch (err) {}
+  }
+
+  document.getElementById('login-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var email = document.getElementById('email').value.trim().toLowerCase();
+    var pass = document.getElementById('password').value;
+    sha256Hex(pass).then(function (hex) {
+      var user = USERS.find(function (u) { return u.email === email && u.hash === hex; });
+      if (user) {
+        loginError.hidden = true;
+        enter(user.name);
+      } else {
+        loginError.hidden = false;
+      }
+    }).catch(function () {
+      loginError.hidden = false;
+    });
   });
   document.getElementById('signout').addEventListener('click', function () {
     document.body.classList.remove('authed');
-    try { sessionStorage.removeItem('big-demo-authed'); } catch (err) {}
+    try {
+      sessionStorage.removeItem('big-demo-authed');
+      sessionStorage.removeItem('big-demo-name');
+    } catch (err) {}
   });
   try {
-    if (sessionStorage.getItem('big-demo-authed') === '1') document.body.classList.add('authed');
+    if (sessionStorage.getItem('big-demo-authed') === '1') {
+      var savedName = sessionStorage.getItem('big-demo-name');
+      if (savedName) greetName.textContent = savedName;
+      document.body.classList.add('authed');
+    }
   } catch (err) {}
 
   var nav = document.getElementById('nav');
