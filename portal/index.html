@@ -1,0 +1,1214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Investor Portal — Beck Investment Group</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bitter:ital,wght@0,300..700;1,300..700&family=Source+Sans+3:ital,wght@0,300..700;1,300..700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    /* D3 · ranch heritage */
+    --page:      #F1EBDD;   /* cream stock, deep */
+    --surface:   #FBF7EE;   /* card */
+    --surface-2: #F5EFE3;   /* inset panel */
+    --white:     #FFFDF8;
+    --ink:       #2B2724;   /* iron */
+    --ink-2:     #5C544A;
+    --muted:     #8C8172;
+    --hairline:  rgba(43,39,36,0.16);
+    --grid:      rgba(43,39,36,0.08);
+    --oxblood:   #5A1F24;
+    --oxblood-lt:#7A2E34;
+    --saddle:    #A9784A;
+    --saddle-lt: #D8B58C;
+    --brass:     #8C6A3F;
+    --good:      #2E6B33;
+
+    /* Categorical series — validated (CVD + contrast) against #FBF7EE */
+    --series-1: #A63A41;  /* brick   */
+    --series-2: #B07818;  /* brass   */
+    --series-3: #3E68A8;  /* denim   */
+    --series-4: #128455;  /* juniper */
+    --series-5: #8B5FA8;  /* plum    */
+  }
+
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--page);
+    color: var(--ink);
+    font-family: 'Source Sans 3', sans-serif;
+    font-weight: 400;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Paper grain */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+    opacity: 0.03;
+    pointer-events: none;
+    z-index: 100;
+  }
+
+  a { color: var(--oxblood); text-decoration: none; }
+  a:hover { color: var(--oxblood-lt); }
+
+  /* ============ LOGIN ============ */
+  .login-page {
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 48px 20px;
+    position: relative;
+  }
+  .login-card {
+    position: relative;
+    width: min(420px, 100%);
+    background: var(--surface);
+    border: 1px solid var(--hairline);
+    border-top: 3px solid var(--oxblood);
+    padding: 44px 40px 36px;
+    text-align: center;
+  }
+  .login-seal { width: 88px; height: 88px; margin: 0 auto 16px; display: block; color: var(--oxblood); }
+  .login-word {
+    font-family: 'Bitter', serif;
+    font-weight: 650; font-size: 15px;
+    letter-spacing: 0.34em; text-transform: uppercase;
+    color: var(--oxblood);
+  }
+  .login-sub {
+    font-size: 10.5px; font-weight: 500;
+    letter-spacing: 0.46em; text-transform: uppercase;
+    color: var(--muted);
+    margin: 12px 0 30px;
+  }
+  .field { text-align: left; margin-bottom: 16px; }
+  .field label {
+    display: block;
+    font-size: 10.5px; font-weight: 600;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--ink-2);
+    margin-bottom: 7px;
+  }
+  .field input {
+    width: 100%;
+    background: var(--white);
+    border: 1px solid var(--hairline);
+    color: var(--ink);
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 15px;
+    padding: 12px 14px;
+    outline: none;
+    transition: border-color .25s ease;
+  }
+  .field input:focus { border-color: var(--saddle); }
+  .btn-brand {
+    width: 100%;
+    margin-top: 8px;
+    background: var(--oxblood);
+    color: #F5EFE3;
+    border: none;
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 12.5px; font-weight: 600;
+    letter-spacing: 0.26em; text-transform: uppercase;
+    padding: 14px 18px;
+    cursor: pointer;
+    transition: background .25s ease;
+  }
+  .btn-brand:hover { background: var(--oxblood-lt); }
+  .login-demo {
+    margin-top: 18px;
+    font-size: 12.5px; color: var(--muted); letter-spacing: 0.04em;
+  }
+  .login-foot {
+    margin-top: 28px; padding-top: 20px;
+    border-top: 1px solid var(--hairline);
+    font-size: 12px; font-weight: 400;
+    letter-spacing: 0.1em; color: var(--muted); line-height: 1.9;
+  }
+  .login-back { margin-top: 26px; font-size: 11.5px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; }
+
+  /* ============ APP SHELL ============ */
+  .app { display: none; }
+  body.authed .app { display: block; }
+  body.authed .login-page { display: none; }
+
+  .topbar {
+    position: sticky; top: 0; z-index: 50;
+    background: var(--oxblood);
+    border-bottom: 1px solid rgba(43,39,36,0.3);
+  }
+  .topbar-inner {
+    max-width: 1200px; margin: 0 auto;
+    padding: 0 24px;
+    display: flex; align-items: center; gap: 20px;
+    height: 64px;
+    color: #F5EFE3;
+  }
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .brand svg { width: 30px; height: 30px; color: #F5EFE3; flex: none; }
+  .brand-name {
+    font-family: 'Bitter', serif;
+    font-weight: 600; font-size: 13px;
+    letter-spacing: 0.26em; text-transform: uppercase;
+    color: #F5EFE3;
+    white-space: nowrap;
+  }
+  .demo-pill {
+    font-size: 9px; font-weight: 700; letter-spacing: 0.22em;
+    color: var(--saddle-lt);
+    border: 1px solid rgba(216,181,140,0.5);
+    padding: 3px 9px; border-radius: 2px;
+  }
+  .nav { display: flex; gap: 4px; margin-left: auto; }
+  .nav button {
+    background: none; border: none;
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 12px; font-weight: 600;
+    letter-spacing: 0.16em; text-transform: uppercase;
+    color: rgba(245,239,227,0.66);
+    padding: 10px 14px;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: color .2s ease;
+  }
+  .nav button:hover { color: rgba(245,239,227,0.9); }
+  .nav button.active { color: #F5EFE3; border-bottom-color: var(--saddle-lt); }
+  .signout {
+    background: none; border: 1px solid rgba(245,239,227,0.35);
+    color: rgba(245,239,227,0.85);
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 10.5px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase;
+    padding: 8px 14px; cursor: pointer;
+    transition: border-color .2s ease, color .2s ease;
+  }
+  .signout:hover { border-color: var(--saddle-lt); color: #F5EFE3; }
+
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 36px 24px 90px; }
+  .view { display: none; }
+  .view.active { display: block; }
+
+  /* ============ SHARED PIECES ============ */
+  .eyebrow {
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 0.34em; text-transform: uppercase;
+    color: var(--oxblood);
+    margin-bottom: 10px;
+  }
+  h1.page-title {
+    font-family: 'Bitter', serif;
+    font-weight: 600; font-size: clamp(27px, 4vw, 36px);
+    letter-spacing: -0.01em;
+    color: var(--ink);
+  }
+  .page-sub { color: var(--ink-2); font-size: 14px; margin-top: 8px; letter-spacing: 0.02em; }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--hairline);
+    padding: 26px 28px;
+  }
+  .card + .card, section + section { margin-top: 22px; }
+  .card-title {
+    font-size: 11.5px; font-weight: 700;
+    letter-spacing: 0.24em; text-transform: uppercase;
+    color: var(--ink);
+    margin-bottom: 4px;
+  }
+  .card-sub { font-size: 13px; color: var(--ink-2); letter-spacing: 0.01em; }
+
+  /* Stat tiles */
+  .kpi-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(215px, 1fr));
+    gap: 14px;
+    margin-top: 22px;
+  }
+  .tile {
+    background: var(--surface);
+    border: 1px solid var(--hairline);
+    padding: 20px 22px;
+  }
+  .tile .t-label { font-size: 10.5px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-2); }
+  .tile .t-value { font-size: 26px; font-weight: 650; color: var(--ink); margin-top: 10px; }
+  .tile .t-note  { font-size: 12px; color: var(--muted); margin-top: 8px; letter-spacing: 0.01em; }
+
+  /* Hero */
+  .hero-card {
+    background: var(--surface);
+    border: 1px solid var(--hairline);
+    border-top: 3px solid var(--oxblood);
+    padding: 30px 32px;
+    margin-top: 26px;
+    display: flex; flex-wrap: wrap; gap: 30px; align-items: flex-end; justify-content: space-between;
+  }
+  .hero-label { font-size: 10.5px; font-weight: 700; letter-spacing: 0.26em; text-transform: uppercase; color: var(--ink-2); }
+  .hero-value { font-family: 'Bitter', serif; font-size: clamp(42px, 6vw, 54px); font-weight: 650; color: var(--ink); line-height: 1.1; margin-top: 10px; }
+  .hero-delta { display: flex; align-items: center; gap: 8px; margin-top: 12px; font-size: 13.5px; flex-wrap: wrap; }
+  .hero-delta .up { color: var(--good); font-weight: 700; }
+  .hero-delta .since { color: var(--muted); }
+  .hero-meta { text-align: right; font-size: 13px; color: var(--muted); line-height: 2; letter-spacing: 0.02em; }
+  .hero-meta strong { color: var(--ink-2); font-weight: 600; }
+
+  /* ============ STACKED ALLOCATION BAR ============ */
+  .stack-wrap { margin-top: 24px; }
+  .stack-bar {
+    display: flex;
+    height: 22px;
+    border-radius: 4px;
+    overflow: hidden;
+    background: var(--surface); /* gap color between segments */
+    gap: 2px;
+  }
+  .stack-seg {
+    position: relative;
+    display: flex; align-items: center; justify-content: center;
+    cursor: default;
+    outline: none;
+    transition: filter .15s ease;
+    min-width: 4px;
+  }
+  .stack-seg:first-child { border-radius: 4px 0 0 4px; }
+  .stack-seg:last-child  { border-radius: 0 4px 4px 0; }
+  .stack-seg:hover, .stack-seg:focus-visible { filter: brightness(1.12); }
+  .stack-seg .seg-label {
+    font-size: 10.5px; font-weight: 700; letter-spacing: 0.04em;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+  .legend {
+    display: flex; flex-wrap: wrap;
+    gap: 8px 26px;
+    margin-top: 18px;
+  }
+  .legend-item { display: flex; align-items: center; gap: 9px; font-size: 13px; }
+  .legend-swatch { width: 11px; height: 11px; border-radius: 2px; flex: none; }
+  .legend-name { color: var(--ink); font-weight: 500; }
+  .legend-val { color: var(--muted); }
+
+  /* Allocation table */
+  table.alloc {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 22px;
+    font-size: 14px;
+  }
+  table.alloc th {
+    text-align: left;
+    font-size: 10.5px; font-weight: 700;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--ink-2);
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--hairline);
+  }
+  table.alloc td {
+    padding: 13px 12px;
+    border-bottom: 1px solid var(--grid);
+    color: var(--ink-2);
+    vertical-align: top;
+  }
+  table.alloc td.num { font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--ink); font-weight: 600; }
+  table.alloc td .why { color: var(--ink-2); font-size: 13px; line-height: 1.6; }
+  table.alloc .row-key { display: flex; align-items: center; gap: 9px; font-weight: 600; color: var(--ink); white-space: nowrap; }
+  table.alloc tfoot td { border-bottom: none; border-top: 1px solid var(--hairline); font-weight: 700; color: var(--ink); }
+  .table-scroll { overflow-x: auto; }
+
+  /* ============ LINE CHART ============ */
+  .chart-box { position: relative; margin-top: 20px; }
+  .chart-box svg { display: block; width: 100%; height: auto; }
+  .tooltip {
+    position: fixed;
+    z-index: 200;
+    background: #241F1B;
+    border: 1px solid rgba(245,239,227,0.15);
+    padding: 10px 13px;
+    pointer-events: none;
+    display: none;
+    box-shadow: 0 8px 24px rgba(43,39,36,0.35);
+    min-width: 150px;
+  }
+  .tooltip .tt-title { font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: #B8AD9C; margin-bottom: 6px; }
+  .tooltip .tt-row { display: flex; align-items: center; gap: 8px; font-size: 12.5px; padding: 2px 0; }
+  .tooltip .tt-key { width: 12px; height: 3px; border-radius: 2px; flex: none; }
+  .tooltip .tt-val { font-weight: 700; color: #F5EFE3; }
+  .tooltip .tt-name { color: #B8AD9C; }
+
+  /* ============ PROJECT CARDS ============ */
+  .cards-3 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+    gap: 14px;
+    margin-top: 20px;
+  }
+  .proj {
+    background: var(--surface);
+    border: 1px solid var(--hairline);
+    padding: 24px;
+    display: flex; flex-direction: column;
+  }
+  .proj-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+  .proj h3 {
+    font-family: 'Bitter', serif;
+    font-weight: 650; font-size: 20px;
+    color: var(--ink);
+  }
+  .proj .loc { font-size: 11px; color: var(--muted); font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; margin-top: 6px; }
+  .proj-key { width: 12px; height: 12px; border-radius: 2px; flex: none; margin-top: 6px; }
+  .pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 10.5px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+    border: 1px solid var(--hairline);
+    color: var(--ink-2);
+    padding: 4px 10px; border-radius: 2px;
+    margin-top: 14px; margin-right: 6px;
+  }
+  .pill.good { color: var(--good); border-color: rgba(46,107,51,0.4); }
+  .pill.good::before { content: '✓'; font-size: 11px; }
+  .proj-stats { margin-top: 18px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px; }
+  .ps .l { font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+  .ps .v { font-size: 16px; font-weight: 650; color: var(--ink); margin-top: 4px; }
+  .meter { margin-top: 18px; }
+  .meter .m-head { display: flex; justify-content: space-between; font-size: 12px; color: var(--ink-2); margin-bottom: 7px; }
+  .meter .m-head strong { color: var(--ink); font-weight: 700; }
+  .meter .m-track { height: 6px; border-radius: 3px; background: rgba(90,31,36,0.15); overflow: hidden; }
+  .meter .m-fill { height: 100%; border-radius: 3px; background: var(--oxblood); }
+  .proj .why { margin-top: 16px; font-size: 13.5px; color: var(--ink-2); line-height: 1.7; border-top: 1px solid var(--hairline); padding-top: 14px; }
+  .proj .why strong { color: var(--ink); font-weight: 600; }
+
+  /* Activity */
+  .act-row {
+    display: flex; align-items: baseline; gap: 16px;
+    padding: 13px 4px;
+    border-bottom: 1px solid var(--grid);
+    font-size: 14px;
+  }
+  .act-row:last-child { border-bottom: none; }
+  .act-date { width: 92px; flex: none; color: var(--muted); font-size: 12px; }
+  .act-desc { flex: 1; color: var(--ink); }
+  .act-desc small { display: block; color: var(--muted); margin-top: 2px; font-size: 12.5px; }
+  .act-amt { font-variant-numeric: tabular-nums; font-weight: 700; color: var(--ink); white-space: nowrap; }
+  .act-amt.pos { color: var(--good); }
+
+  /* ============ FUND OVERVIEW ============ */
+  .terms-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--hairline);
+    border: 1px solid var(--hairline);
+    margin-top: 20px;
+  }
+  @media (max-width: 980px) { .terms-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 480px) { .terms-grid { grid-template-columns: 1fr; } }
+  .term { background: var(--surface); padding: 20px 22px; }
+  .term .l { font-size: 10px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); }
+  .term .v { font-family: 'Bitter', serif; font-size: 17px; font-weight: 650; color: var(--ink); margin-top: 8px; }
+  .term .n { font-size: 12px; color: var(--muted); margin-top: 6px; line-height: 1.6; }
+
+  .prose { font-size: 15px; color: var(--ink-2); line-height: 1.85; letter-spacing: 0.005em; max-width: 74ch; }
+  .prose + .prose { margin-top: 14px; }
+
+  .pipeline { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+  .pipe-step {
+    flex: 1; min-width: 180px;
+    background: var(--surface-2);
+    border: 1px solid var(--hairline);
+    padding: 18px 20px;
+    position: relative;
+  }
+  .pipe-step .num { font-family: 'Bitter', serif; font-size: 24px; color: var(--saddle); font-weight: 650; }
+  .pipe-step .t { font-size: 11.5px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink); margin-top: 6px; }
+  .pipe-step .d { font-size: 13px; color: var(--ink-2); margin-top: 8px; line-height: 1.65; }
+
+  .doc-row {
+    display: flex; align-items: center; gap: 14px;
+    padding: 15px 4px;
+    border-bottom: 1px solid var(--grid);
+    font-size: 14.5px;
+  }
+  .doc-row:last-child { border-bottom: none; }
+  .doc-ic { color: var(--saddle); font-size: 15px; flex: none; }
+  .doc-name { flex: 1; color: var(--ink); font-weight: 500; }
+  .doc-name small { display: block; color: var(--muted); font-weight: 400; margin-top: 2px; font-size: 12.5px; }
+  .doc-btn {
+    background: none; border: 1px solid var(--hairline);
+    color: var(--ink-2);
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 10.5px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase;
+    padding: 7px 14px; cursor: pointer;
+  }
+  .doc-btn:hover { border-color: var(--saddle); color: var(--ink); }
+
+  /* ============ OFFERINGS ============ */
+  .offer {
+    background: var(--surface);
+    border: 1px solid var(--hairline);
+    padding: 28px 30px;
+  }
+  .offer + .offer { margin-top: 16px; }
+  .offer.open-offer { border-top: 3px solid var(--oxblood); }
+  .offer-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 12px; justify-content: space-between; }
+  .offer h3 { font-family: 'Bitter', serif; font-weight: 650; font-size: 23px; color: var(--ink); }
+  .offer .status-tag { font-size: 10.5px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; }
+  .status-tag.open { color: var(--oxblood); }
+  .status-tag.future { color: var(--muted); }
+  .offer .desc { margin-top: 12px; font-size: 14.5px; color: var(--ink-2); line-height: 1.75; max-width: 74ch; }
+  .offer-facts { display: flex; flex-wrap: wrap; gap: 12px 36px; margin-top: 18px; }
+  .offer-facts .f .l { font-size: 10px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); }
+  .offer-facts .f .v { font-size: 16px; font-weight: 650; color: var(--ink); margin-top: 5px; }
+  .offer.locked { opacity: 0.78; }
+  .notify-btn {
+    margin-top: 18px;
+    background: none; border: 1px solid var(--oxblood);
+    color: var(--oxblood);
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase;
+    padding: 11px 22px; cursor: pointer;
+    transition: background .2s ease;
+  }
+  .notify-btn:hover { background: rgba(90,31,36,0.06); }
+
+  .footnote {
+    margin-top: 46px;
+    padding-top: 22px;
+    border-top: 1px solid var(--hairline);
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.9;
+    letter-spacing: 0.01em;
+    max-width: 90ch;
+  }
+  .footnote strong { color: var(--ink-2); }
+
+  @media (max-width: 760px) {
+    .topbar-inner { flex-wrap: wrap; height: auto; padding: 10px 16px; }
+    .nav { margin-left: 0; width: 100%; order: 3; overflow-x: auto; }
+    .hero-meta { text-align: left; }
+    .wrap { padding: 26px 16px 70px; }
+    .card { padding: 20px 18px; }
+  }
+</style>
+</head>
+<body data-palette="#A63A41,#B07818,#3E68A8,#128455,#8B5FA8">
+
+<!-- ================= LOGIN ================= -->
+<div class="login-page">
+  <div class="login-card">
+    <svg class="login-seal" viewBox="0 0 100 100" role="img" aria-label="Beck Investment Group Diamond B mark">
+      <g stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" fill="none">
+        <path d="M 50 6 L 94 50 L 50 94 L 6 50 Z"/>
+        <line x1="40" y1="28" x2="40" y2="72"/>
+        <path d="M 40 28 H 51 A 11 11 0 0 1 51 50 H 40"/>
+        <path d="M 40 50 H 54 A 11 11 0 0 1 54 72 H 40"/>
+      </g>
+    </svg>
+    <div class="login-word">Beck Investment Group</div>
+    <div class="login-sub">Investor Portal</div>
+
+    <form id="login-form">
+      <div class="field">
+        <label for="email">Email</label>
+        <input id="email" type="email" autocomplete="username" placeholder="you@example.com">
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input id="password" type="password" autocomplete="current-password" placeholder="••••••••••">
+      </div>
+      <button class="btn-brand" type="submit">Sign In</button>
+    </form>
+
+    <div class="login-demo">Design preview — any credentials open the demo account.</div>
+
+    <div class="login-foot">
+      BIG Growth Fund I, LP &nbsp;·&nbsp; Texas Hill Country<br>
+      Accredited investors only &nbsp;·&nbsp; Minimum commitment $750,000
+    </div>
+  </div>
+  <div class="login-back"><a href="../">← beckfunds.com</a></div>
+</div>
+
+<!-- ================= APP ================= -->
+<div class="app">
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><g stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M 12 2.5 L 21.5 12 L 12 21.5 L 2.5 12 Z"/><line x1="9.8" y1="8" x2="9.8" y2="16"/><path d="M 9.8 8 H 12 A 2 2 0 0 1 12 12 H 9.8"/><path d="M 9.8 12 H 12.6 A 2 2 0 0 1 12.6 16 H 9.8"/></g></svg>
+        <span class="brand-name">Beck Investment Group</span>
+      </div>
+      <span class="demo-pill">DEMO PREVIEW</span>
+      <nav class="nav" id="nav">
+        <button data-view="capital" class="active">My Capital</button>
+        <button data-view="fund">Fund Overview</button>
+        <button data-view="offerings">Offerings</button>
+      </nav>
+      <button class="signout" id="signout">Sign Out</button>
+    </div>
+  </header>
+
+  <main class="wrap">
+
+    <!-- ============ VIEW: MY CAPITAL ============ -->
+    <div class="view active" id="view-capital">
+
+      <div class="eyebrow">BIG Growth Fund I, LP</div>
+      <h1 class="page-title">Welcome back, Jordan</h1>
+      <p class="page-sub">Investor since February 2026 &nbsp;·&nbsp; Class A Limited Partner &nbsp;·&nbsp; Statement as of August 11, 2026</p>
+
+      <div class="hero-card">
+        <div>
+          <div class="hero-label">Current account value</div>
+          <div class="hero-value">$771,540</div>
+          <div class="hero-delta">
+            <span class="up">▲ +$21,540&nbsp;(+2.9%)</span>
+            <span class="since">since initial funding · excludes $7,500 already distributed to you</span>
+          </div>
+        </div>
+        <div class="hero-meta">
+          Capital committed <strong>$750,000</strong><br>
+          Preferred return <strong>8% · accruing</strong><br>
+          Next statement <strong>September 30, 2026</strong>
+        </div>
+      </div>
+
+      <div class="kpi-row">
+        <div class="tile">
+          <div class="t-label">Deployed in projects</div>
+          <div class="t-value">$525,000</div>
+          <div class="t-note">70.0% of your capital · 3 active projects</div>
+        </div>
+        <div class="tile">
+          <div class="t-label">Cash &amp; reserves</div>
+          <div class="t-value">$225,000</div>
+          <div class="t-note">30.0% · earning 4.30% APY while awaiting deployment</div>
+        </div>
+        <div class="tile">
+          <div class="t-label">Interest earned to date</div>
+          <div class="t-value">$14,040</div>
+          <div class="t-note">High-yield savings, Feb – Aug 2026</div>
+        </div>
+        <div class="tile">
+          <div class="t-label">Distributions received</div>
+          <div class="t-value">$7,500</div>
+          <div class="t-note">Quarterly preferred distribution · paid Jul 15, 2026</div>
+        </div>
+      </div>
+
+      <!-- Where every dollar sits -->
+      <section class="card" style="margin-top:22px;">
+        <div class="card-title">Where every dollar sits</div>
+        <div class="card-sub">Your $750,000 commitment, by current allocation. Hover any segment for detail — the full breakdown is in the table below.</div>
+
+        <div class="stack-wrap">
+          <div class="stack-bar" id="stack-bar" role="img" aria-label="Allocation of $750,000: Cypress Creek $225,000 (30%), Vaquero Ridge $180,000 (24%), The Verandas $120,000 (16%), high-yield savings $195,000 (26%), capital reserve $30,000 (4%)"></div>
+          <div class="legend" id="stack-legend"></div>
+        </div>
+
+        <div class="table-scroll">
+          <table class="alloc">
+            <thead>
+              <tr>
+                <th>Allocation</th>
+                <th>Type</th>
+                <th style="text-align:right;">Amount</th>
+                <th style="text-align:right;">Share</th>
+                <th>Why your capital is here</th>
+              </tr>
+            </thead>
+            <tbody id="alloc-body"></tbody>
+            <tfoot>
+              <tr>
+                <td>Total</td><td></td>
+                <td class="num" style="text-align:right;">$750,000</td>
+                <td class="num" style="text-align:right;">100%</td>
+                <td></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </section>
+
+      <!-- Account value over time -->
+      <section class="card">
+        <div class="card-title">Account value since inception</div>
+        <div class="card-sub">Monthly net asset value of your account, February – August 2026. Move across the chart for exact values.</div>
+        <div class="chart-box" id="nav-chart"></div>
+      </section>
+
+      <!-- Projects -->
+      <section>
+        <div class="card-title" style="margin-top:34px;">Your projects</div>
+        <div class="card-sub">The three developments your deployed capital is working in today.</div>
+
+        <div class="cards-3">
+
+          <div class="proj">
+            <div class="proj-top">
+              <div>
+                <h3>The Summit at Cypress Creek</h3>
+                <div class="loc">Wimberley, Texas</div>
+              </div>
+              <span class="proj-key" style="background:var(--series-1);"></span>
+            </div>
+            <div>
+              <span class="pill">New-build luxury residential</span>
+              <span class="pill good">On schedule</span>
+            </div>
+            <div class="proj-stats">
+              <div class="ps"><div class="l">Your capital</div><div class="v">$225,000</div></div>
+              <div class="ps"><div class="l">Of your portfolio</div><div class="v">30.0%</div></div>
+              <div class="ps"><div class="l">Target multiple</div><div class="v">1.8×</div></div>
+              <div class="ps"><div class="l">Est. completion</div><div class="v">Q3 2027</div></div>
+            </div>
+            <div class="meter">
+              <div class="m-head"><span>Construction progress</span><strong>62%</strong></div>
+              <div class="m-track"><div class="m-fill" style="width:62%;"></div></div>
+            </div>
+            <div class="why"><strong>Why we're here:</strong> Four custom homes on 2–4 acre view lots above Cypress Creek. Wimberley inventory at this price point is effectively zero; pre-sales cover two of four builds.</div>
+          </div>
+
+          <div class="proj">
+            <div class="proj-top">
+              <div>
+                <h3>Vaquero Ridge Estates</h3>
+                <div class="loc">Dripping Springs, Texas</div>
+              </div>
+              <span class="proj-key" style="background:var(--series-2);"></span>
+            </div>
+            <div>
+              <span class="pill">12-lot land development</span>
+              <span class="pill good">On schedule</span>
+            </div>
+            <div class="proj-stats">
+              <div class="ps"><div class="l">Your capital</div><div class="v">$180,000</div></div>
+              <div class="ps"><div class="l">Of your portfolio</div><div class="v">24.0%</div></div>
+              <div class="ps"><div class="l">Target multiple</div><div class="v">1.6×</div></div>
+              <div class="ps"><div class="l">Est. completion</div><div class="v">Q1 2027</div></div>
+            </div>
+            <div class="meter">
+              <div class="m-head"><span>Entitlement &amp; horizontal work</span><strong>45%</strong></div>
+              <div class="m-track"><div class="m-fill" style="width:45%;"></div></div>
+            </div>
+            <div class="why"><strong>Why we're here:</strong> 38 acres purchased below market from an estate sale. Utilities at the road, plat approved; finished-lot demand from national builders in the corridor remains deep.</div>
+          </div>
+
+          <div class="proj">
+            <div class="proj-top">
+              <div>
+                <h3>The Verandas</h3>
+                <div class="loc">Fredericksburg, Texas</div>
+              </div>
+              <span class="proj-key" style="background:var(--series-3);"></span>
+            </div>
+            <div>
+              <span class="pill">Hospitality · value-add</span>
+              <span class="pill good">On schedule</span>
+            </div>
+            <div class="proj-stats">
+              <div class="ps"><div class="l">Your capital</div><div class="v">$120,000</div></div>
+              <div class="ps"><div class="l">Of your portfolio</div><div class="v">16.0%</div></div>
+              <div class="ps"><div class="l">Target multiple</div><div class="v">1.7×</div></div>
+              <div class="ps"><div class="l">Est. stabilized</div><div class="v">Q4 2026</div></div>
+            </div>
+            <div class="meter">
+              <div class="m-head"><span>Renovation progress</span><strong>78%</strong></div>
+              <div class="m-track"><div class="m-fill" style="width:78%;"></div></div>
+            </div>
+            <div class="why"><strong>Why we're here:</strong> Six-cottage guest compound two blocks off Main Street, acquired off-market. Renovation repositions it to the luxury short-stay segment ahead of the 2027 season.</div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- Cash & reserves -->
+      <section class="card">
+        <div class="card-title">Cash &amp; reserves</div>
+        <div class="card-sub">Undeployed capital never sits idle — it earns in insured, interest-bearing accounts until a project calls for it.</div>
+
+        <div class="table-scroll">
+          <table class="alloc">
+            <thead>
+              <tr>
+                <th>Account</th>
+                <th style="text-align:right;">Balance</th>
+                <th style="text-align:right;">Rate</th>
+                <th>Purpose</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="row-key"><span class="legend-swatch" style="background:var(--series-4);"></span>High-yield savings</span></td>
+                <td class="num" style="text-align:right;">$195,000</td>
+                <td class="num" style="text-align:right;">4.30% APY</td>
+                <td><span class="why">Capital queued for the next deployment. Interest accrues to your account monthly — $14,040 earned to date.</span></td>
+              </tr>
+              <tr>
+                <td><span class="row-key"><span class="legend-swatch" style="background:var(--series-5);"></span>Capital reserve escrow</span></td>
+                <td class="num" style="text-align:right;">$30,000</td>
+                <td class="num" style="text-align:right;">4.05% APY</td>
+                <td><span class="why">Construction contingency held in escrow — protects project timelines without a capital call.</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Activity -->
+      <section class="card">
+        <div class="card-title">Account activity</div>
+        <div class="card-sub">Every movement of your capital, newest first.</div>
+        <div style="margin-top:14px;">
+          <div class="act-row"><span class="act-date">Aug 1, 2026</span><span class="act-desc">Interest credited <small>High-yield savings · July accrual</small></span><span class="act-amt pos">+$698</span></div>
+          <div class="act-row"><span class="act-date">Jul 15, 2026</span><span class="act-desc">Preferred distribution paid <small>Q2 2026 · 8% preferred return · wired to account ending 4417</small></span><span class="act-amt pos">+$7,500</span></div>
+          <div class="act-row"><span class="act-date">Jun 2, 2026</span><span class="act-desc">Capital deployed — The Verandas <small>Transferred from high-yield savings</small></span><span class="act-amt">$120,000</span></div>
+          <div class="act-row"><span class="act-date">Apr 8, 2026</span><span class="act-desc">Capital deployed — Vaquero Ridge Estates <small>Transferred from high-yield savings</small></span><span class="act-amt">$180,000</span></div>
+          <div class="act-row"><span class="act-date">Mar 12, 2026</span><span class="act-desc">Capital deployed — The Summit at Cypress Creek <small>Transferred from high-yield savings</small></span><span class="act-amt">$225,000</span></div>
+          <div class="act-row"><span class="act-date">Feb 4, 2026</span><span class="act-desc">Swept to high-yield savings <small>Full balance earning 4.30% APY while awaiting deployment</small></span><span class="act-amt">$750,000</span></div>
+          <div class="act-row"><span class="act-date">Feb 3, 2026</span><span class="act-desc">Capital contribution received <small>Wire transfer · subscription complete</small></span><span class="act-amt pos">+$750,000</span></div>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- ============ VIEW: FUND OVERVIEW ============ -->
+    <div class="view" id="view-fund">
+
+      <div class="eyebrow">The Fund</div>
+      <h1 class="page-title">BIG Growth Fund I, LP</h1>
+      <p class="page-sub">Private real estate — Texas Hill Country &nbsp;·&nbsp; Vintage 2026</p>
+
+      <section class="card" style="margin-top:26px;">
+        <div class="card-title">Strategy</div>
+        <p class="prose" style="margin-top:14px;">
+          BIG Growth Fund I acquires, develops, and repositions residential and hospitality real estate
+          across the Texas Hill Country — one of the fastest-growing corridors in the country, with
+          structural supply constraints in the markets we know street by street.
+        </p>
+        <p class="prose">
+          The fund is built on a simple discipline: every dollar is either working in a project we
+          control, or earning in an insured interest-bearing account while it waits. Nothing sits idle,
+          and every investor can see exactly where their capital is — project by project, account by
+          account — at any time, on this portal.
+        </p>
+      </section>
+
+      <section class="card">
+        <div class="card-title">Terms at a glance</div>
+        <div class="terms-grid">
+          <div class="term"><div class="l">Minimum commitment</div><div class="v">$750,000</div><div class="n">Accredited investors only</div></div>
+          <div class="term"><div class="l">Target fund size</div><div class="v">$15,000,000</div><div class="n">First close held Feb 2026</div></div>
+          <div class="term"><div class="l">Preferred return</div><div class="v">8% annually</div><div class="n">Paid quarterly, before any carry</div></div>
+          <div class="term"><div class="l">Profit split above pref</div><div class="v">70 / 30</div><div class="n">In favor of limited partners</div></div>
+          <div class="term"><div class="l">Target net IRR</div><div class="v">15 – 18%</div><div class="n">Fund-level, net of fees</div></div>
+          <div class="term"><div class="l">Term</div><div class="v">5 years</div><div class="n">Two one-year extensions at GP option</div></div>
+          <div class="term"><div class="l">Distributions</div><div class="v">Quarterly</div><div class="n">ACH or wire, your choice</div></div>
+          <div class="term"><div class="l">Reporting</div><div class="v">Live portal + quarterly</div><div class="n">Audited annually · K-1 each March</div></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-title">How your capital moves</div>
+        <div class="card-sub">The lifecycle of every committed dollar.</div>
+        <div class="pipeline">
+          <div class="pipe-step"><div class="num">01</div><div class="t">Committed</div><div class="d">Your subscription closes and funds arrive by wire or ACH.</div></div>
+          <div class="pipe-step"><div class="num">02</div><div class="t">Earning</div><div class="d">Capital is swept to insured high-yield accounts the next business day — it earns from day one.</div></div>
+          <div class="pipe-step"><div class="num">03</div><div class="t">Deployed</div><div class="d">As projects clear underwriting, capital moves into them. You see each transfer in your activity feed.</div></div>
+          <div class="pipe-step"><div class="num">04</div><div class="t">Harvested</div><div class="d">Sales and refinances return capital — distributed quarterly or recycled into the next project, per fund terms.</div></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-title">Documents</div>
+        <div class="card-sub">Placeholder items — document delivery will be wired up in a later build.</div>
+        <div style="margin-top:12px;">
+          <div class="doc-row"><span class="doc-ic">◈</span><span class="doc-name">Private Placement Memorandum <small>Fund I · January 2026</small></span><button class="doc-btn" type="button">View PDF</button></div>
+          <div class="doc-row"><span class="doc-ic">◈</span><span class="doc-name">Limited Partnership Agreement <small>Executed copy</small></span><button class="doc-btn" type="button">View PDF</button></div>
+          <div class="doc-row"><span class="doc-ic">◈</span><span class="doc-name">Subscription Agreement <small>Your executed copy · Feb 3, 2026</small></span><button class="doc-btn" type="button">View PDF</button></div>
+          <div class="doc-row"><span class="doc-ic">◈</span><span class="doc-name">Quarterly Report — Q2 2026 <small>Published July 20, 2026</small></span><button class="doc-btn" type="button">View PDF</button></div>
+          <div class="doc-row"><span class="doc-ic">◈</span><span class="doc-name">Schedule K-1 — 2026 <small>Available March 2027</small></span><button class="doc-btn" type="button" disabled style="opacity:.45;cursor:default;">Pending</button></div>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- ============ VIEW: OFFERINGS ============ -->
+    <div class="view" id="view-offerings">
+
+      <div class="eyebrow">Offerings</div>
+      <h1 class="page-title">Current &amp; upcoming opportunities</h1>
+      <p class="page-sub">As new funds and co-investments open, they appear here first — existing investors always have priority allocation.</p>
+
+      <section style="margin-top:26px;">
+
+        <div class="offer open-offer">
+          <div class="offer-head">
+            <h3>BIG Growth Fund I, LP</h3>
+            <span class="status-tag open">Open · Final Close Q4 2026</span>
+          </div>
+          <p class="desc">Residential and hospitality development across the Texas Hill Country. You are invested in this fund.</p>
+          <div class="offer-facts">
+            <div class="f"><div class="l">Committed</div><div class="v">$11.4M of $15M</div></div>
+            <div class="f"><div class="l">Minimum</div><div class="v">$750,000</div></div>
+            <div class="f"><div class="l">Preferred return</div><div class="v">8%</div></div>
+            <div class="f"><div class="l">Target net IRR</div><div class="v">15 – 18%</div></div>
+          </div>
+          <div class="meter" style="max-width:460px;">
+            <div class="m-head"><span>Raise progress</span><strong>76%</strong></div>
+            <div class="m-track"><div class="m-fill" style="width:76%;"></div></div>
+          </div>
+        </div>
+
+        <div class="offer locked">
+          <div class="offer-head">
+            <h3>BIG Growth Fund II</h3>
+            <span class="status-tag future">Future · Targeting 2027</span>
+          </div>
+          <p class="desc">A larger successor vehicle extending the Fund I playbook into adjacent Hill Country markets, with a dedicated hospitality sleeve. Terms to be published with the offering documents.</p>
+          <button class="notify-btn" type="button">Notify me at launch</button>
+        </div>
+
+        <div class="offer locked">
+          <div class="offer-head">
+            <h3>Direct co-investments</h3>
+            <span class="status-tag future">Future</span>
+          </div>
+          <p class="desc">Deal-by-deal allocations alongside the fund for investors who want concentrated exposure to a single project. Offered to existing LPs first.</p>
+          <button class="notify-btn" type="button">Join the interest list</button>
+        </div>
+
+        <div class="offer">
+          <div class="offer-head">
+            <h3 style="font-size:19px;">Funding your commitment</h3>
+          </div>
+          <p class="desc">
+            Today, commitments are funded by wire transfer with subscription documents. In a future release
+            you'll be able to link a bank account securely, fund by wire or ACH, and track incoming transfers
+            here — no banker in the middle.
+          </p>
+        </div>
+
+      </section>
+    </div>
+
+    <div class="footnote">
+      <strong>Design preview.</strong> All names, figures, projects, accounts, rates, and returns on this page are
+      illustrative sample data for interface design purposes only. Nothing here is an offer to sell, or a solicitation of an
+      offer to buy, any security. Any offering is made only to accredited investors through definitive offering
+      documents. © 2026 Beck Investment Group.
+    </div>
+
+  </main>
+</div>
+
+<div class="tooltip" id="tooltip" role="tooltip" aria-hidden="true"></div>
+
+<script>
+(function () {
+  'use strict';
+
+  var fmtUSD = function (n) { return '$' + Math.round(n).toLocaleString('en-US'); };
+
+  /* ---------- data ---------- */
+  var ALLOC = [
+    { name: 'The Summit at Cypress Creek', type: 'Project · Wimberley, TX',        amount: 225000, color: 'var(--series-1)', hex: '#A63A41', labelColor: '#FFFDF8',
+      why: 'Four custom homes on view lots above Cypress Creek — pre-sales already cover two of four builds.' },
+    { name: 'Vaquero Ridge Estates',       type: 'Project · Dripping Springs, TX', amount: 180000, color: 'var(--series-2)', hex: '#B07818', labelColor: '#2B2724',
+      why: '12-lot land development bought below market; plat approved, deep finished-lot demand in the corridor.' },
+    { name: 'The Verandas',                type: 'Project · Fredericksburg, TX',   amount: 120000, color: 'var(--series-3)', hex: '#3E68A8', labelColor: '#FFFDF8',
+      why: 'Off-market guest compound near Main Street, repositioning to luxury short-stay before the 2027 season.' },
+    { name: 'High-yield savings',          type: 'Cash · 4.30% APY',               amount: 195000, color: 'var(--series-4)', hex: '#128455', labelColor: '#FFFDF8',
+      why: 'Capital queued for the next deployment — earning insured interest every day it waits.' },
+    { name: 'Capital reserve escrow',      type: 'Cash · 4.05% APY',               amount: 30000,  color: 'var(--series-5)', hex: '#8B5FA8', labelColor: '#FFFDF8',
+      why: 'Construction contingency, so surprises never require a capital call.' }
+  ];
+  var TOTAL = ALLOC.reduce(function (s, a) { return s + a.amount; }, 0);
+
+  var NAV = [
+    { m: 'Feb 2026', v: 750000 },
+    { m: 'Mar 2026', v: 752340 },
+    { m: 'Apr 2026', v: 755910 },
+    { m: 'May 2026', v: 760180 },
+    { m: 'Jun 2026', v: 763450 },
+    { m: 'Jul 2026', v: 767820 },
+    { m: 'Aug 2026', v: 771540 }
+  ];
+
+  /* chart chrome (matches CSS tokens) */
+  var C = {
+    surface: '#FBF7EE',
+    ink: '#2B2724',
+    muted: '#8C8172',
+    grid: 'rgba(43,39,36,0.08)',
+    line: '#A63A41',
+    wash: 'rgba(166,58,65,0.10)',
+    crosshair: 'rgba(43,39,36,0.3)'
+  };
+
+  /* ---------- tooltip (shared) ---------- */
+  var tip = document.getElementById('tooltip');
+  function showTip(x, y, title, rows) {
+    tip.textContent = '';
+    var t = document.createElement('div');
+    t.className = 'tt-title';
+    t.textContent = title;
+    tip.appendChild(t);
+    rows.forEach(function (r) {
+      var row = document.createElement('div');
+      row.className = 'tt-row';
+      var key = document.createElement('span');
+      key.className = 'tt-key';
+      key.style.background = r.color || 'transparent';
+      var val = document.createElement('span');
+      val.className = 'tt-val';
+      val.textContent = r.value;
+      var name = document.createElement('span');
+      name.className = 'tt-name';
+      name.textContent = r.name;
+      row.appendChild(key); row.appendChild(val); row.appendChild(name);
+      tip.appendChild(row);
+    });
+    tip.style.display = 'block';
+    var w = tip.offsetWidth, h = tip.offsetHeight;
+    var left = Math.min(x + 14, window.innerWidth - w - 10);
+    var top = y - h - 14;
+    if (top < 8) top = y + 18;
+    tip.style.left = left + 'px';
+    tip.style.top = top + 'px';
+    tip.setAttribute('aria-hidden', 'false');
+  }
+  function hideTip() { tip.style.display = 'none'; tip.setAttribute('aria-hidden', 'true'); }
+
+  /* ---------- stacked allocation bar ---------- */
+  var bar = document.getElementById('stack-bar');
+  var legend = document.getElementById('stack-legend');
+  var allocBody = document.getElementById('alloc-body');
+
+  ALLOC.forEach(function (a) {
+    var pct = a.amount / TOTAL * 100;
+
+    var seg = document.createElement('div');
+    seg.className = 'stack-seg';
+    seg.style.flexBasis = pct + '%';
+    seg.style.flexGrow = '0';
+    seg.style.background = a.color;
+    seg.tabIndex = 0;
+    seg.setAttribute('aria-label', a.name + ': ' + fmtUSD(a.amount) + ' (' + pct.toFixed(0) + '%)');
+    // direct label only where it comfortably fits; legend + tooltip carry the rest
+    if (pct >= 14) {
+      var lbl = document.createElement('span');
+      lbl.className = 'seg-label';
+      lbl.style.color = a.labelColor;
+      lbl.textContent = pct.toFixed(0) + '%';
+      seg.appendChild(lbl);
+    }
+    function onHover(e) {
+      var pt = e.touches ? e.touches[0] : e;
+      var x = (pt && pt.clientX != null) ? pt.clientX : seg.getBoundingClientRect().left + seg.offsetWidth / 2;
+      var y = (pt && pt.clientY != null) ? pt.clientY : seg.getBoundingClientRect().top;
+      showTip(x, y, a.type, [{ color: a.hex, value: fmtUSD(a.amount) + ' · ' + pct.toFixed(1) + '%', name: a.name }]);
+    }
+    seg.addEventListener('pointermove', onHover);
+    seg.addEventListener('pointerleave', hideTip);
+    seg.addEventListener('focus', onHover);
+    seg.addEventListener('blur', hideTip);
+    bar.appendChild(seg);
+
+    var li = document.createElement('div');
+    li.className = 'legend-item';
+    var sw = document.createElement('span');
+    sw.className = 'legend-swatch';
+    sw.style.background = a.color;
+    var nm = document.createElement('span');
+    nm.className = 'legend-name';
+    nm.textContent = a.name;
+    var vl = document.createElement('span');
+    vl.className = 'legend-val';
+    vl.textContent = fmtUSD(a.amount) + ' · ' + pct.toFixed(0) + '%';
+    li.appendChild(sw); li.appendChild(nm); li.appendChild(vl);
+    legend.appendChild(li);
+
+    var tr = document.createElement('tr');
+    var td1 = document.createElement('td');
+    var rk = document.createElement('span');
+    rk.className = 'row-key';
+    var rksw = document.createElement('span');
+    rksw.className = 'legend-swatch';
+    rksw.style.background = a.color;
+    rk.appendChild(rksw);
+    rk.appendChild(document.createTextNode(a.name));
+    td1.appendChild(rk);
+    var td2 = document.createElement('td');
+    td2.textContent = a.type;
+    var td3 = document.createElement('td');
+    td3.className = 'num'; td3.style.textAlign = 'right';
+    td3.textContent = fmtUSD(a.amount);
+    var td4 = document.createElement('td');
+    td4.className = 'num'; td4.style.textAlign = 'right';
+    td4.textContent = pct.toFixed(0) + '%';
+    var td5 = document.createElement('td');
+    var why = document.createElement('span');
+    why.className = 'why';
+    why.textContent = a.why;
+    td5.appendChild(why);
+    tr.appendChild(td1); tr.appendChild(td2); tr.appendChild(td3); tr.appendChild(td4); tr.appendChild(td5);
+    allocBody.appendChild(tr);
+  });
+
+  /* ---------- NAV line chart ---------- */
+  var box = document.getElementById('nav-chart');
+  var W = 960, H = 300;
+  var M = { top: 24, right: 96, bottom: 34, left: 64 };
+  var iw = W - M.left - M.right, ih = H - M.top - M.bottom;
+  var yMin = 745000, yMax = 775000;
+  var xAt = function (i) { return M.left + (NAV.length === 1 ? 0 : i * iw / (NAV.length - 1)); };
+  var yAt = function (v) { return M.top + ih - (v - yMin) / (yMax - yMin) * ih; };
+
+  var NS = 'http://www.w3.org/2000/svg';
+  var svg = document.createElementNS(NS, 'svg');
+  svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+  svg.setAttribute('role', 'img');
+  svg.setAttribute('aria-label', 'Account value rose from $750,000 in February 2026 to $771,540 in August 2026');
+
+  // gridlines + y ticks (clean numbers)
+  [745000, 755000, 765000, 775000].forEach(function (v) {
+    var y = yAt(v);
+    var ln = document.createElementNS(NS, 'line');
+    ln.setAttribute('x1', M.left); ln.setAttribute('x2', M.left + iw);
+    ln.setAttribute('y1', y); ln.setAttribute('y2', y);
+    ln.setAttribute('stroke', C.grid);
+    ln.setAttribute('stroke-width', '1');
+    svg.appendChild(ln);
+    var tx = document.createElementNS(NS, 'text');
+    tx.setAttribute('x', M.left - 10); tx.setAttribute('y', y + 4);
+    tx.setAttribute('text-anchor', 'end');
+    tx.setAttribute('font-size', '11');
+    tx.setAttribute('fill', C.muted);
+    tx.setAttribute('font-family', 'Source Sans 3, sans-serif');
+    tx.textContent = '$' + (v / 1000) + 'K';
+    svg.appendChild(tx);
+  });
+
+  // x labels
+  NAV.forEach(function (d, i) {
+    var tx = document.createElementNS(NS, 'text');
+    tx.setAttribute('x', xAt(i)); tx.setAttribute('y', H - 10);
+    tx.setAttribute('text-anchor', 'middle');
+    tx.setAttribute('font-size', '11');
+    tx.setAttribute('fill', C.muted);
+    tx.setAttribute('font-family', 'Source Sans 3, sans-serif');
+    tx.textContent = d.m.split(' ')[0];
+    svg.appendChild(tx);
+  });
+
+  // area wash (~10% opacity) + 2px line in series brick
+  var pts = NAV.map(function (d, i) { return xAt(i) + ',' + yAt(d.v); });
+  var area = document.createElementNS(NS, 'polygon');
+  area.setAttribute('points', pts.join(' ') + ' ' + xAt(NAV.length - 1) + ',' + (M.top + ih) + ' ' + xAt(0) + ',' + (M.top + ih));
+  area.setAttribute('fill', C.wash);
+  svg.appendChild(area);
+  var line = document.createElementNS(NS, 'polyline');
+  line.setAttribute('points', pts.join(' '));
+  line.setAttribute('fill', 'none');
+  line.setAttribute('stroke', C.line);
+  line.setAttribute('stroke-width', '2');
+  line.setAttribute('stroke-linejoin', 'round');
+  line.setAttribute('stroke-linecap', 'round');
+  svg.appendChild(line);
+
+  // end marker: 8px dot with 2px surface ring
+  var last = NAV[NAV.length - 1];
+  var ring = document.createElementNS(NS, 'circle');
+  ring.setAttribute('cx', xAt(NAV.length - 1)); ring.setAttribute('cy', yAt(last.v));
+  ring.setAttribute('r', '6');
+  ring.setAttribute('fill', C.surface);
+  svg.appendChild(ring);
+  var dot = document.createElementNS(NS, 'circle');
+  dot.setAttribute('cx', xAt(NAV.length - 1)); dot.setAttribute('cy', yAt(last.v));
+  dot.setAttribute('r', '4');
+  dot.setAttribute('fill', C.line);
+  svg.appendChild(dot);
+  // endpoint direct label (text token, not series color)
+  var endLbl = document.createElementNS(NS, 'text');
+  endLbl.setAttribute('x', xAt(NAV.length - 1) + 12);
+  endLbl.setAttribute('y', yAt(last.v) + 4);
+  endLbl.setAttribute('font-size', '12');
+  endLbl.setAttribute('font-weight', '700');
+  endLbl.setAttribute('fill', C.ink);
+  endLbl.setAttribute('font-family', 'Source Sans 3, sans-serif');
+  endLbl.textContent = '$771,540';
+  svg.appendChild(endLbl);
+
+  // crosshair
+  var cross = document.createElementNS(NS, 'line');
+  cross.setAttribute('y1', M.top); cross.setAttribute('y2', M.top + ih);
+  cross.setAttribute('stroke', C.crosshair);
+  cross.setAttribute('stroke-width', '1');
+  cross.style.display = 'none';
+  svg.appendChild(cross);
+  var hoverDotRing = document.createElementNS(NS, 'circle');
+  hoverDotRing.setAttribute('r', '6'); hoverDotRing.setAttribute('fill', C.surface);
+  hoverDotRing.style.display = 'none';
+  svg.appendChild(hoverDotRing);
+  var hoverDot = document.createElementNS(NS, 'circle');
+  hoverDot.setAttribute('r', '4'); hoverDot.setAttribute('fill', C.line);
+  hoverDot.style.display = 'none';
+  svg.appendChild(hoverDot);
+
+  svg.addEventListener('pointermove', function (e) {
+    var rect = svg.getBoundingClientRect();
+    var px = (e.clientX - rect.left) * (W / rect.width);
+    var idx = Math.round((px - M.left) / (iw / (NAV.length - 1)));
+    idx = Math.max(0, Math.min(NAV.length - 1, idx));
+    var d = NAV[idx];
+    var cx = xAt(idx), cy = yAt(d.v);
+    cross.setAttribute('x1', cx); cross.setAttribute('x2', cx);
+    cross.style.display = '';
+    hoverDotRing.setAttribute('cx', cx); hoverDotRing.setAttribute('cy', cy); hoverDotRing.style.display = '';
+    hoverDot.setAttribute('cx', cx); hoverDot.setAttribute('cy', cy); hoverDot.style.display = '';
+    showTip(e.clientX, e.clientY, d.m, [{ color: C.line, value: fmtUSD(d.v), name: 'Account value' }]);
+  });
+  svg.addEventListener('pointerleave', function () {
+    cross.style.display = 'none';
+    hoverDotRing.style.display = 'none';
+    hoverDot.style.display = 'none';
+    hideTip();
+  });
+  box.appendChild(svg);
+
+  /* ---------- auth + nav ---------- */
+  document.getElementById('login-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    document.body.classList.add('authed');
+    window.scrollTo(0, 0);
+    try { sessionStorage.setItem('big-demo-authed', '1'); } catch (err) {}
+  });
+  document.getElementById('signout').addEventListener('click', function () {
+    document.body.classList.remove('authed');
+    try { sessionStorage.removeItem('big-demo-authed'); } catch (err) {}
+  });
+  try {
+    if (sessionStorage.getItem('big-demo-authed') === '1') document.body.classList.add('authed');
+  } catch (err) {}
+
+  var nav = document.getElementById('nav');
+  nav.addEventListener('click', function (e) {
+    var btn = e.target.closest('button');
+    if (!btn) return;
+    nav.querySelectorAll('button').forEach(function (b) { b.classList.remove('active'); });
+    btn.classList.add('active');
+    document.querySelectorAll('.view').forEach(function (v) { v.classList.remove('active'); });
+    document.getElementById('view-' + btn.dataset.view).classList.add('active');
+    window.scrollTo(0, 0);
+  });
+})();
+</script>
+
+</body>
+</html>
