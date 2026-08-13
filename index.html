@@ -59,23 +59,9 @@
     animation: fadeUp 1.2s cubic-bezier(0.16,1,0.3,1) 0.2s forwards;
   }
   .mark {
-    width: clamp(140px, 24vw, 200px);
-    height: clamp(140px, 24vw, 200px);
-    color: var(--oxblood);
-    margin-bottom: 34px;
-  }
-
-  .wordmark {
-    font-family: 'Bitter', serif;
-    font-weight: 650;
-    font-size: clamp(15px, 2.4vw, 21px);
-    letter-spacing: 0.4em;
-    color: var(--oxblood);
-    text-transform: uppercase;
-    text-align: center;
-    padding-left: 0.4em; /* optically recenter tracked caps */
-    opacity: 0;
-    animation: fadeUp 1.2s cubic-bezier(0.16,1,0.3,1) 0.5s forwards;
+    width: clamp(300px, 52vw, 480px);
+    height: auto;
+    margin-bottom: 6px;
   }
 
   .rule {
@@ -189,17 +175,21 @@
 
   <div class="logo-wrap">
 
-    <!-- Diamond B — working mark; final logo TBD -->
-    <svg class="mark" viewBox="0 0 100 100" role="img" aria-label="Beck Investment Group Diamond B mark">
-      <g stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none">
-        <path d="M 50 6 L 94 50 L 50 94 L 6 50 Z"/>
-        <line x1="40" y1="28" x2="40" y2="72"/>
-        <path d="M 40 28 H 51 A 11 11 0 0 1 51 50 H 40"/>
-        <path d="M 40 50 H 54 A 11 11 0 0 1 54 72 H 40"/>
+    <!-- Flanked lockup: BECK ◆B GROUP · INVESTMENT — diamond optically centered (24px painted gaps) -->
+    <svg class="mark" viewBox="0 0 420 120" role="img" aria-label="Beck Investment Group — Diamond B lockup">
+      <g transform="translate(-36.1 0)">
+        <text x="185" y="60" text-anchor="end" font-family="Bitter, serif" font-weight="600" font-size="30" letter-spacing="9" fill="#5A1F24">BECK</text>
+        <g stroke="#5A1F24" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" fill="none">
+          <path d="M 230 19 L 260 49 L 230 79 L 200 49 Z"/>
+          <line x1="222" y1="35" x2="222" y2="63"/>
+          <path d="M 222 35 H 229 A 7 7 0 0 1 229 49 H 222"/>
+          <path d="M 222 49 H 231 A 7 7 0 0 1 231 63 H 222"/>
+        </g>
+        <text x="284" y="60" text-anchor="start" font-family="Bitter, serif" font-weight="600" font-size="30" letter-spacing="9" fill="#5A1F24">GROUP</text>
+        <text x="233.5" y="103" text-anchor="middle" font-family="Bitter, serif" font-weight="600" font-size="12" letter-spacing="7" fill="#8C6A3F">INVESTMENT</text>
       </g>
     </svg>
 
-    <div class="wordmark">Beck Investment Group</div>
     <div class="rule"></div>
     <div class="tagline">Built for More.</div>
 
