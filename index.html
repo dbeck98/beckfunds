@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Beck Investment Group — Built for More</title>
+<title>Beck &amp; Co. | Land &amp; Capital, Texas Hill Country</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bitter:ital,wght@0,300..700;1,300..700&family=Source+Sans+3:ital,wght@0,300..700;1,300..700&display=swap" rel="stylesheet">
@@ -58,10 +58,27 @@
     opacity: 0;
     animation: fadeUp 1.2s cubic-bezier(0.16,1,0.3,1) 0.2s forwards;
   }
-  .mark {
-    width: clamp(300px, 52vw, 480px);
-    height: auto;
-    margin-bottom: 6px;
+  .wordmark {
+    font-family: 'Bitter', serif;
+    font-weight: 600;
+    font-size: clamp(38px, 8.4vw, 74px);
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--oxblood);
+    padding-left: 0.22em;
+    line-height: 1.04;
+    text-align: center;
+  }
+  .descriptor {
+    font-family: 'Bitter', serif;
+    font-weight: 600;
+    font-size: clamp(9px, 1.5vw, 12.5px);
+    letter-spacing: 0.34em;
+    text-transform: uppercase;
+    color: var(--brass);
+    padding-left: 0.34em;
+    margin-top: 14px;
+    text-align: center;
   }
 
   .rule {
@@ -133,19 +150,6 @@
   }
   .contact a:hover { color: var(--oxblood-lt); }
 
-  .fund-pill {
-    border: 1px solid var(--saddle);
-    padding: 9px 24px;
-    font-family: 'Bitter', serif;
-    font-weight: 500;
-    font-size: clamp(11px, 1.6vw, 13px);
-    letter-spacing: 0.26em;
-    color: var(--oxblood);
-    text-transform: uppercase;
-    text-align: center;
-    opacity: 0;
-    animation: fadeIn 1.4s ease 1.6s forwards;
-  }
 
   .bottom-rule {
     position: fixed;
@@ -154,6 +158,11 @@
     background: linear-gradient(90deg, transparent 0%, var(--saddle) 30%, var(--oxblood) 50%, var(--saddle) 70%, transparent 100%);
     opacity: 0;
     animation: fadeIn 2s ease 2s forwards;
+  }
+
+  @media (max-width: 520px) {
+    .wordmark { font-size: clamp(28px, 8vw, 40px); letter-spacing: 0.15em; padding-left: 0.15em; }
+    .descriptor { letter-spacing: 0.24em; padding-left: 0.24em; font-size: 9px; }
   }
 
   @keyframes fadeUp {
@@ -165,7 +174,7 @@
     to   { opacity: 1; }
   }
   @media (prefers-reduced-motion: reduce) {
-    .logo-wrap, .wordmark, .rule, .tagline, .soon-block, .fund-pill, .bottom-rule { animation: none; opacity: 1; }
+    .logo-wrap, .wordmark, .descriptor, .rule, .tagline, .soon-block, .bottom-rule { animation: none; opacity: 1; }
   }
 </style>
 </head>
@@ -175,20 +184,8 @@
 
   <div class="logo-wrap">
 
-    <!-- Flanked lockup: BECK ◆B GROUP · INVESTMENT — diamond optically centered (24px painted gaps) -->
-    <svg class="mark" viewBox="0 0 420 120" role="img" aria-label="Beck Investment Group — Diamond B lockup">
-      <g transform="translate(-36.1 0)">
-        <text x="185" y="60" text-anchor="end" font-family="Bitter, serif" font-weight="600" font-size="30" letter-spacing="9" fill="#5A1F24">BECK</text>
-        <g stroke="#5A1F24" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" fill="none">
-          <path d="M 230 19 L 260 49 L 230 79 L 200 49 Z"/>
-          <line x1="222" y1="35" x2="222" y2="63"/>
-          <path d="M 222 35 H 229 A 7 7 0 0 1 229 49 H 222"/>
-          <path d="M 222 49 H 231 A 7 7 0 0 1 231 63 H 222"/>
-        </g>
-        <text x="284" y="60" text-anchor="start" font-family="Bitter, serif" font-weight="600" font-size="30" letter-spacing="9" fill="#5A1F24">GROUP</text>
-        <text x="233.5" y="103" text-anchor="middle" font-family="Bitter, serif" font-weight="600" font-size="12" letter-spacing="7" fill="#8C6A3F">INVESTMENT</text>
-      </g>
-    </svg>
+    <div class="wordmark">Beck &amp; Co.</div>
+    <div class="descriptor">Land &amp; Capital &middot; Texas Hill Country</div>
 
     <div class="rule"></div>
     <div class="tagline">Built for More.</div>
@@ -205,10 +202,6 @@
     <div class="contact">
       <a href="portal/">Investor Portal &rarr;</a>
     </div>
-  </div>
-
-  <div class="fund-pill" style="margin-top: 40px;">
-    BIG Growth Fund I, LP &nbsp;&middot;&nbsp; Texas Hill Country
   </div>
 
 </main>
